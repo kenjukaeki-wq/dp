@@ -1,0 +1,61 @@
+x-app: &app
+  build: .
+  env_file: .env
+  environment:
+    SQLITE_DIR: /app/data
+    REDIS_URL: redis://redis:6379/0
+  volumes:
+    - sqlite_data:/app/data
+    - media:/app/private_media
+  restart: unless-stopped
+
+services:
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "127.0.0.1:6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    restart: unless-stopped
+  init:
+    <<: *app
+    command: ["sh", "-c", "python manage.py migrate --noinput && python manage.py collectstatic --noinput"]
+    restart: "no"
+    volumes:
+      - sqlite_data:/app/data
+      - static_data:/app/staticfiles
+    depends_on:
+      redis:
+        condition: service_healthy
+  web:
+    <<: *app
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - media:/app/private_media
+      - sqlite_data:/app/data
+      - static_data:/app/staticfiles
+    depends_on:
+      init:
+        condition: service_completed_successfully
+  worker:
+    <<: *app
+    command: ["python", "manage.py", "runworker"]
+    depends_on:
+      init:
+        condition: service_completed_successfully
+  bot:
+    <<: *app
+    profiles: ["telegram"]
+    command: ["python", "manage.py", "runbot"]
+    depends_on:
+      init:
+        condition: service_completed_successfully
+
+volumes:
+  sqlite_data:
+  media:
+  static_data:

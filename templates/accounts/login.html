@@ -1,0 +1,3 @@
+{% extends 'base.html' %}{% block content %}<section class="panel form-panel"><p class="eyebrow">С ВОЗВРАЩЕНИЕМ</p><h1>Войти в EduPlatform</h1><p class="muted">Ваши группы, занятия и задания — в одном месте.</p>
+<form method="post">{% csrf_token %}{{ form.as_p }}<input type="hidden" name="next" value="{{ next }}"><button>Войти</button></form>
+<p>Нет аккаунта? <a href="{% url 'register' %}">Зарегистрироваться</a></p></section>{% endblock %}

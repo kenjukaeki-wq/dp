@@ -1,0 +1,1 @@
+{% for material in materials %}<div class="list-row"><strong>{{ material.title }}</strong>{% if material.file %}<a href="{% url 'material_download' material.pk %}">Скачать ↓</a>{% else %}<a href="{{ material.url }}" target="_blank" rel="noopener noreferrer">Открыть ↗</a>{% endif %}</div>{% empty %}<p class="muted">Материалов пока нет.</p>{% endfor %}

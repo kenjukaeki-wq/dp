@@ -1,0 +1,6 @@
+{% extends 'base.html' %}{% block content %}<div class="page-heading"><div><p class="eyebrow">АККАУНТ</p><h1>Мой профиль</h1><p class="muted">{{ user.get_role_display }}</p></div></div>
+<div class="columns"><section class="panel"><h2>Личные данные</h2><form method="post">{% csrf_token %}{{ form.as_p }}<button>Сохранить</button></form></section>
+<section class="panel"><h2>Telegram</h2><p>Получайте напоминания о занятиях, новых заданиях и оценках.</p>
+{% if linked %}<p class="badge live">Подключён</p><form method="post" action="{% url 'telegram_disconnect' %}">{% csrf_token %}<button class="secondary">Отключить</button></form>
+{% elif bot_enabled %}<form method="post" action="{% url 'telegram_connect' %}">{% csrf_token %}<button>Подключить Telegram</button></form>
+{% else %}<p class="muted">Бот ещё не настроен администратором.</p>{% endif %}</section></div>{% endblock %}
